@@ -8,190 +8,93 @@ namespace PasswordGenerator
 {
     public class Service
     {
-        public static string GeneratePassword
+        public static string GeneratePassword()
         {
-            get
+            bool[] requirements = new bool[] { CapitalLettersRequired(), DigitsRequired(), LowercaseLettersRequired(), SpecialCharactersRequired() };
+            int[] characterLengths = new int[] { 0, 0, 0, 0 };
+            int passwordLength = GetPasswordLength();
+            bool valid = true;
+            string password = "";
+            do
             {
-                bool[] requirements = new bool[] {CapitalLetters, Digits, LowercaseLetters, SpecialCharacters};
-                int[] characterLengths = new int[]{0,0,0,0};
-                int passwordLength = PasswordLength;
-                bool valid = true;
-                string password = "";
-                do
+                for (int i = 0; i < passwordLength; i++)
                 {
-                    for (int i = 0; i < passwordLength; i++)
+                    char c = NextCharacter();
+                    password += c;
+                    if (IsCapital(c))
                     {
-                        char c = NextCharacter;
-                        password += c;
-                        if (IsCapital(c))
-                        {
-                            characterLengths[0]++;
-                        }
-                        else if (IsDigit(c))
-                        {
-                            characterLengths[1]++;
-                        }
-                        else if (IsLowerCase(c))
-                        {
-                            characterLengths[2]++;
-                        }
-                        else
-                        {
-                            characterLengths[3]++;
-                        }
+                        characterLengths[0]++;
                     }
-                    for (int j = 0; j < requirements.Length && valid; j++)
+                    else if (IsDigit(c))
                     {
-                        if (requirements[j] && characterLengths[j] == 0)
-                        {
-                            valid = !valid;
-                        }
+                        characterLengths[1]++;
                     }
-                } while (!valid);
-                return password;
-            }
-        }
-
-        public static bool KeepGenerating
-        {
-            get
-            {
-                while (true)
-                {
-                    Console.WriteLine("Do you want another password generated? ");
-                    string answer = Console.ReadLine();
-                    if ("NO" == answer.ToUpper() || "N" == answer.ToUpper())
+                    else if (IsLowerCase(c))
                     {
-                        return false;
-                    }
-                    else if ("YES" == answer.ToUpper() || "Y" == answer.ToUpper())
-                    {
-                        return true;
+                        characterLengths[2]++;
                     }
                     else
                     {
-                        Console.WriteLine("This is a yes or no question. Try again.");
+                        characterLengths[3]++;
                     }
+                }
+                for (int j = 0; j < requirements.Length && valid; j++)
+                {
+                    valid = requirements[j] ? characterLengths[j] > 0 : characterLengths[j] == 0;
+                }
+            } while (!valid);
+            return password;
+        }
+
+        public static bool KeepGenerating()
+        {
+            while (true)
+            {
+                Console.WriteLine("Do you want another password generated? ");
+                string answer = Console.ReadLine();
+                if ("NO" == answer.ToUpper() || "N" == answer.ToUpper())
+                {
+                    return false;
+                }
+                else if ("YES" == answer.ToUpper() || "Y" == answer.ToUpper())
+                {
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("This is a yes or no question. Try again.");
                 }
             }
         }
 
-        private static bool CapitalLetters
+        private static bool CapitalLettersRequired()
         {
-            get
+            while (true)
             {
-                while (true)
+                Console.WriteLine("Requires Capital Letters: True or False");
+                try
                 {
-                    Console.WriteLine("Requires Capital Letters: True or False");
-                    try
-                    {
-                        return Convert.ToBoolean(Console.ReadLine());
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("This is a true or false question. Try Again.");
-                    }
+                    return Convert.ToBoolean(Console.ReadLine());
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("This is a true or false question. Try Again.");
                 }
             }
         }
 
-        private static bool Digits
+        private static bool DigitsRequired()
         {
-            get
+            while (true)
             {
-                while (true)
+                Console.WriteLine("Requires Digits: True or False");
+                try
                 {
-                    Console.WriteLine("Requires Digits: True or False");
-                    try
-                    {
-                        return Convert.ToBoolean(Console.ReadLine());
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("This is a true or false question. Try Again.");
-                    }
+                    return Convert.ToBoolean(Console.ReadLine());
                 }
-            }
-        }
-
-        private static bool LowercaseLetters
-        {
-            get
-            {
-                while (true)
+                catch (FormatException)
                 {
-                    Console.WriteLine("Requires Lowercase Letters: True or False");
-                    try
-                    {
-                        return Convert.ToBoolean(Console.ReadLine());
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("This is a true or false question. Try Again.");
-                    }
-                }
-            }
-        }
-
-        private static int MinimumPasswordLength
-        {
-            get
-            {
-                while (true)
-                {
-                    Console.WriteLine("Enter a minimum length: ");
-                    try
-                    {
-                        int value = Convert.ToInt32(Console.ReadLine());
-                        if (value <= 0)
-                        {
-                            Console.WriteLine("The password length must be at least 1.");
-                        }
-                        else
-                        {
-                            return value;
-                        }
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("The answer must be a whole number. Try Again.");
-                    }
-                }
-            }
-        }
-
-        private static char NextCharacter
-        {
-            get
-            {
-                return (char)GetRandomNumberBetween(33, 126);
-            }
-        }
-
-        private static int PasswordLength
-        {
-            get
-            {
-                int min = MinimumPasswordLength;
-                return GetRandomNumberBetween(min, GetMaximumLength(min));
-            }
-        }
-
-        private static bool SpecialCharacters
-        {
-            get
-            {
-                while (true)
-                {
-                    Console.WriteLine("Requires Special Characters: True or False");
-                    try
-                    {
-                        return Convert.ToBoolean(Console.ReadLine());
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("This is a true or false question. Try Again.");
-                    }
+                    Console.WriteLine("This is a true or false question. Try Again.");
                 }
             }
         }
@@ -220,6 +123,36 @@ namespace PasswordGenerator
             }
         }
 
+        private static int GetMinimumPasswordLength()
+        {
+            while (true)
+            {
+                Console.WriteLine("Enter a minimum length: ");
+                try
+                {
+                    int value = Convert.ToInt32(Console.ReadLine());
+                    if (value <= 0)
+                    {
+                        Console.WriteLine("The password length must be at least 1.");
+                    }
+                    else
+                    {
+                        return value;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("The answer must be a whole number. Try Again.");
+                }
+            }
+        }
+
+        private static int GetPasswordLength()
+        {
+            int min = GetMinimumPasswordLength();
+            return GetRandomNumberBetween(min, GetMaximumLength(min));
+        }
+
         private static int GetRandomNumberBetween(int min, int max)
         {
             Random random = new Random();
@@ -239,6 +172,43 @@ namespace PasswordGenerator
         private static bool IsLowerCase(char value)
         {
             return value >= 97 && value <= 122;
+        }
+
+        private static bool LowercaseLettersRequired()
+        {
+            while (true)
+            {
+                Console.WriteLine("Requires Lowercase Letters: True or False");
+                try
+                {
+                    return Convert.ToBoolean(Console.ReadLine());
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("This is a true or false question. Try Again.");
+                }
+            }
+        }
+
+        private static char NextCharacter()
+        {
+            return (char)GetRandomNumberBetween(33, 126);
+        }
+
+        private static bool SpecialCharactersRequired()
+        {
+            while (true)
+            {
+                Console.WriteLine("Requires Special Characters: True or False");
+                try
+                {
+                    return Convert.ToBoolean(Console.ReadLine());
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("This is a true or false question. Try Again.");
+                }
+            }
         }
     }
 }
