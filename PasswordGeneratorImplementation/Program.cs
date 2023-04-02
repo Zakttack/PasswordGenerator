@@ -1,4 +1,4 @@
-﻿using PasswordGenerator;
+﻿using PasswordGeneratorImplementation;
 Console.WriteLine("Welcome to my Password Generator.");
 do
 {
