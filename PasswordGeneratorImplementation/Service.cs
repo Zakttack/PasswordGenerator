@@ -19,7 +19,7 @@ namespace PasswordGenerator
             {
                 for (int i = 0; i < passwordLength; i++)
                 {
-                    char c = NextCharacter();
+                    char c = NextCharacter(requirements);
                     password += c;
                     if (IsCapital(c))
                     {
@@ -64,6 +64,62 @@ namespace PasswordGenerator
                 {
                     Console.WriteLine("This is a yes or no question. Try again.");
                 }
+            }
+        }
+
+        private static ISet<char> CapitalPositions
+        {
+            get
+            {
+                ISet<char> positions = new HashSet<char>();
+                for (int c = 65; c <= 95; c++)
+                {
+                    positions.Add((char)c);
+                }
+                return positions;
+            }
+        }
+
+        private static ISet<char> DigitPositions
+        {
+            get
+            {
+                ISet<char> positions = new HashSet<char>();
+                for (int c = 48; c <= 57; c++)
+                {
+                    positions.Add((char)c);
+                }
+                return positions;
+            }
+        }
+
+        private static ISet<char> LowercasePositions
+        {
+            get
+            {
+                ISet<char> positions = new HashSet<char>();
+                for (int c = 97; c <= 122; c++)
+                {
+                    positions.Add((char)c);
+                }
+                return positions;
+            }
+        }
+
+        private static ISet<char> SpecialCharacterPositions
+        {
+            get
+            {
+                ISet<char> positions = new HashSet<char>();
+                for (int c = 33; c <= 126; c++)
+                {
+                    if (!CapitalPositions.Contains((char)c) && !DigitPositions.Contains((char)c)
+                        && !LowercasePositions.Contains((char)c))
+                    {
+                        positions.Add((char)c);
+                    }
+                }
+                return positions;
             }
         }
 
@@ -155,8 +211,13 @@ namespace PasswordGenerator
 
         private static int GetRandomNumberBetween(int min, int max)
         {
-            Random random = new Random();
-            return random.Next(max - min + 1) + min;
+            Random rand = new Random();
+            IList<int> collection = new List<int>();
+            for (int n = min; n <= max; n++)
+            {
+                collection.Add(n);
+            }
+            return collection[rand.Next(collection.Count)];
         }
 
         private static bool IsCapital(char value)
@@ -190,9 +251,24 @@ namespace PasswordGenerator
             }
         }
 
-        private static char NextCharacter()
+        private static char NextCharacter(bool[] requirements)
         {
-            return (char)GetRandomNumberBetween(33, 126);
+            ISet<char> positions = new HashSet<char>();
+            for (int i = 0; i < requirements.Length; i++)
+            {
+                if (requirements[i])
+                {
+                    switch (i)
+                    {
+                        case 0: positions.UnionWith(CapitalPositions); break;
+                        case 1: positions.UnionWith(DigitPositions); break;
+                        case 2: positions.UnionWith(LowercasePositions); break;
+                        case 3: positions.UnionWith(SpecialCharacterPositions); break;
+                    }
+                }
+            }
+            Random rand = new Random();
+            return positions.ToList()[rand.Next(positions.Count)];
         }
 
         private static bool SpecialCharactersRequired()
