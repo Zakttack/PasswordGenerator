@@ -57,7 +57,7 @@
             get
             {
                 ISet<char> positions = new HashSet<char>();
-                for (int c = 65; c <= 95; c++)
+                for (int c = 65; c <= 90; c++)
                 {
                     positions.Add((char)c);
                 }
@@ -98,12 +98,11 @@
                 ISet<char> positions = new HashSet<char>();
                 for (int c = 33; c <= 126; c++)
                 {
-                    if (!CapitalPositions.Contains((char)c) && !DigitPositions.Contains((char)c)
-                        && !LowercasePositions.Contains((char)c))
-                    {
-                        positions.Add((char)c);
-                    }
+                    positions.Add((char)c);
                 }
+                positions.ExceptWith(CapitalPositions);
+                positions.ExceptWith(DigitPositions);
+                positions.ExceptWith(LowercasePositions);
                 return positions;
             }
         }

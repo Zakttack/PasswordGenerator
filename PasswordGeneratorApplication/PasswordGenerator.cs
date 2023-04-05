@@ -16,14 +16,13 @@ namespace PasswordGeneratorApplication
             string caption = "";
             try
             {
-                int min, max;
-                if (!int.TryParse(minInputBox.Text, out min))
+                if (!int.TryParse(minInputBox.Text, out int min))
                 {
                     error = !error;
                     text += $"{minInputBox.Text} is not a number";
                     caption += "Input is not a number";
                 }
-                else if (!int.TryParse(maxInputBox.Text, out max))
+                else if (!int.TryParse(maxInputBox.Text, out int max))
                 {
                     error = !error;
                     text += $"{maxInputBox.Text} is not a number";
@@ -47,6 +46,7 @@ namespace PasswordGeneratorApplication
             }
             finally
             {
+                text += "\n Do you want to generate another password?";
                 DialogResult result = MessageBox.Show(text, caption, buttons, error ? MessageBoxIcon.Error : MessageBoxIcon.Information);
                 if (result == DialogResult.No ) 
                 {
